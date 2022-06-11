@@ -5,26 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ecom</title>
   <style>
+    input[type=file]::file-selector-button {
+      color: var(--mid);
+      padding: 10px 25px;
+      border: 1px solid var(--mid);
+      border-radius: 15px;
+    }
+
+    input[type=file]::file-selector-button:hover {
+      color: red;
+      cursor: pointer;
+    }
+
     :root {
-      --bright: white;
+      --bright: rgb(182, 182, 182);
       --mid: rgb(71, 71, 71);
       --dark: black;
-      --accent-1: #b81212;
-      --accent-2: rgb(90, 170, 53);
+      --accent-1: #ee7123;
+      --accent-2: rgb(117, 183, 86);
       --modal-wrapper: rgba(0, 0, 0, 0.75);
       --modal: rgba(222, 222, 222, 0.65);
       --padding: 30px;
     }
 
+
     /* html, */
     body {
+      background-color: var(--bright);
       padding: var(--padding);
       width: 100vw;
       height: 100vh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      border: 1px solid red;
+      /* border: 1px solid red; */
     }
 
     * {
@@ -36,9 +50,6 @@
       box-sizing: border-box;
       font-family: Helvetica, Arial, sans-serif;
     }
-
-
-
 
     /* message styling */
     .message-wrapper {
@@ -81,7 +92,7 @@
     }
 
     .message * {
-      font-size: 28px;
+      font-size: 2rem;
       margin: auto;
     }
 
@@ -93,21 +104,9 @@
       border: 4px solid var(--accent-1);
     }
 
-    /* this is the form wrapper */
-    #hello {
-      margin: auto;
-      vertical-align: middle;
-      padding: 20px;
-      width: 70vw;
-      height: 70vh;
-      border-radius: 15px;
-      background-color: var(--bright);
-      border: 1px solid var(--mid);
-    }
 
-    /* TODO make this sticky */
     nav {
-      border: 1px solid red;
+      /* border: 1px solid red; */
       position: fixed;
       top: 0px;
       left: 0px;
@@ -120,19 +119,23 @@
     .nav-wrapper {
       display: flex;
       justify-content: space-between;
-      border: 1px solid red;
+      /* border: 1px solid red; */
       width: 100%;
       margin: auto;
-      font-size: 1.4em;
+      font-size: 1.4rem;
     }
 
     .brand-logo {
-      font-size: 2em;
+      font-size: 2rem;
+    }
+
+    .brand-logo span {
+      font-size: 1rem;
     }
 
     .nav-wrapper ul {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       vertical-align: middle;
       list-style: none;
     }
@@ -141,9 +144,98 @@
       margin-left: 20px;
     }
 
-    li a {
-      text-decoration: none !important;
 
+    /* this is the form wrapper */
+    #form-wrapper {
+      margin: auto;
+      min-width: 600px;
+      width: 40vw;
+      height: 65vh;
+      background-color: transparent;
+    }
+
+    form {
+      width: auto;
+      margin: 0px 30px;
+      bottom: 0px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+    }
+
+    form>* {
+      margin-top: 18px;
+      font-size: 1rem;
+    }
+
+    form label {
+      padding: 0px 10px;
+    }
+
+    #gender,
+    #date-of-birth,
+    /* #price, */
+    #cover,
+    #category-id {
+      border-radius: 15px;
+      border: 1px solid;
+    }
+
+    form button {
+      border-radius: 15px;
+      border: 1px solid var(--mid);
+      padding: 10px 30px;
+      margin: 10px 10px 0px;
+      font-size: 1rem;
+    }
+
+    #links {
+      display: flex;
+    }
+
+    a {
+      font-size: 1rem;
+      text-decoration: none;
+      color: var(--dark);
+    }
+
+    .x * {
+      font-size: 1.6rem;
+      font-weight: bolder;
+    }
+
+    hr {
+      margin-top: 8vh;
+    }
+
+    /* utility styling */
+
+    input,
+    select,
+    textarea {
+      border: none;
+      border-bottom: 2px solid var(--mid);
+      margin-bottom: 10px;
+      margin-right: 15px;
+      padding: 10px;
+      font-size: 1rem;
+      background-color: transparent;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    button:focus {
+      outline: none;
+    }
+
+    .none {
+      display: none !important;
+    }
+
+    .action {
+      background-color: var(--accent-2);
     }
   </style>
 </head>
@@ -151,20 +243,96 @@
 <body>
   <nav>
     <div class="nav-wrapper">
-      <a class="brand-logo center">Ecom</a>
-      <ul>
-        <li> <a href="#">Login</a></li>
-        <li> <a href="#">Register</a></li>
-      </ul>
+      <div>
+        <a class="brand-logo center">Ecom <span>Admin Panel</span></a>
+      </div>
+      <div id="links">
+        <ul id="out" class="none">
+          <li id="login"> <a href="#">Login</a></li>
+          <li id="register"> <a href="#">Register</a></li>
+          <li class="x"> <a href="#">X</a></li>
+        </ul>
+        <ul id="in">
+          <!-- <li id="home"> <a href="#">Home</a></li> -->
+          <li id="add-item"> <a href="#">Add Item</a></li>
+          <li id="add-category"> <a href="#">Add Category</a></li>
+          <li class="x"> <a href="#">X</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
-  <ul id="items"></ul>
-
-  <div id="hello">
-    hello
+  <hr>
+  <div id="form-wrapper">
+    <!-- user register form -->
+    <form id="register-form" class="none" name="register-form" novalidate>
+      <input type="text" id="name" placeholder="Enter your name" required>
+      <input type="email" id="register-email" placeholder="Enter your email" required>
+      <!-- dob -->
+      <div>
+        <label for="dob">Birthday:</label>
+        <input type="date" id="date-of-birth" name="date-of-birth" required>
+      </div>
+      <!-- gender -->
+      <div>
+        <label for="gender">Gender:</label>
+        <select name="gender" id="gender" required>
+          <option value="0">Male</option>
+          <option value="1">Female</option>
+        </select>
+      </div>
+      <!-- password -->
+      <label for="password">Password (8 characters minimum):</label>
+      <input type="password" id="register-password" name="password" minlength="8" required>
+      <div>
+        <button id="register-submit" class="action" type="button"> Register</button>
+        <button id="cancel-register"> Cancel</button>
+      </div>
+    </form>
+    <!-- user login form-->
+    <form id="login-form" class="none" name="login-form" novalidate>
+      <input type="email" id="login-email" placeholder="Enter your email" required>
+      <!-- password -->
+      <label for="password">Password (8 characters minimum):</label>
+      <input type="password" id="login-password" name="password" minlength="8" required>
+      <div>
+        <button id="login-submit" class="action" type="button"> Login</button>
+        <button id="cancel-login"> Cancel</button>
+      </div>
+    </form>
+    <!-- add item form-->
+    <form id="add-item-form" class="none" name="add-item-form" novalidate>
+      <input type="text" id="title" placeholder="Enter item title" required>
+      <div>
+        <label for="category-id">Category:</label>
+        <select name="category-id" id="category-id" required>
+          <option value="1">Cat 1</option>
+          <option value="2">Cat 2</option>
+        </select>
+      </div>
+      <input type="text" id="details" placeholder="Enter item details" required>
+      <div>
+        <label for="category-id">Price:</label>
+        <input type="number" id="price" min="1" step="any" />
+      </div>
+      <div>
+        <label for="cover">Cover:</label>
+        <input type="file" id="cover" />
+      </div>
+      <div>
+        <button id="add-item-submit" class="action" type="button">Add Item</button>
+        <button id="cancel-add-item">Cancel</button>
+      </div>
+    </form>
+    <!-- add category form-->
+    <form id="add-category-form" class="" name="add-category-form" novalidate>
+      <input type="text" id="name" placeholder="Enter category name" required>
+      <input type="text" id="description" placeholder="Enter category description" required>
+      <div>
+        <button id="add-category-submit" class="action" type="button"> Add Category</button>
+        <button id="cancel-add-category">Cancel</button>
+      </div>
+    </form>
   </div>
-
-  <button onclick="displayMessage('hey',0)">Hit Api</button>
 
   <script>
     const electron = require('electron');
