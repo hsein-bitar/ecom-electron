@@ -1,4 +1,4 @@
-<style>input[type=file]::file-selector-button {
+input[type=file]::file-selector-button {
     color: var(--mid);
     padding: 10px 25px;
     border: 1px solid var(--mid);
@@ -413,5 +413,3 @@ button:hover {
     background-color: var(--bright);
     color: var(--dark);
 }
-
-</style>
