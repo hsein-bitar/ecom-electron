@@ -17,10 +17,7 @@ app.on('ready', function () {
   // Create new window
   mainWindow = new BrowserWindow({
     show: false,
-    titleBarStyle: {
-      height: 100,
-    },
-    // frame: false,
+    frame: false,
     backgroundColor: '#f6f6f6',
     minWidth: 800,
     minHeight: 600,
@@ -97,19 +94,19 @@ const mainMenuTemplate = [
       {
         label: 'Add Item',
         click() {
-          createItemWindow();
+          mainWindow.webContents.send('addItem');
         }
       },
       {
         label: 'Add Category',
         click() {
-          createCategoryWindow();
+          mainWindow.webContents.send('addCategory');
         }
       },
       {
-        label: 'Clear Items',
+        label: 'Go Home',
         click() {
-          mainWindow.webContents.send('item:clear');
+          mainWindow.webContents.send('home');
         }
       },
       {
@@ -129,6 +126,7 @@ if (process.platform == 'darwin') {
 }
 
 // Add developer tools option if in dev
+
 if (process.env.NODE_ENV !== 'production') {
   mainMenuTemplate.push({
     label: 'Developer Tools',
