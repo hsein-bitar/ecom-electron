@@ -6,10 +6,8 @@ const url = require('url');
 process.env.NODE_ENV = 'development';
 
 const { app, BrowserWindow, Menu, ipcMain } = electron;
-// const { nativeTheme } = require("electron").remote;
 
 let mainWindow;
-let addWindow;
 
 // Listen for app to be ready
 app.on('ready', function () {
@@ -17,7 +15,7 @@ app.on('ready', function () {
   // Create new window
   mainWindow = new BrowserWindow({
     show: false,
-    frame: false,
+    // frame: false,
     backgroundColor: '#f6f6f6',
     minWidth: 800,
     minHeight: 600,
@@ -42,48 +40,6 @@ app.on('ready', function () {
   Menu.setApplicationMenu(mainMenu);
 });
 
-// Handle add item window
-function createItemWindow() {
-  addWindow = new BrowserWindow({
-    width: 300,
-    height: 200,
-    title: 'Add Item'
-  });
-  addWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'addWindow.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
-  // Handle garbage collection
-  addWindow.on('close', function () {
-    addWindow = null;
-  });
-}
-// Handle add item window
-function createCategoryWindow() {
-  addWindow = new BrowserWindow({
-    width: 300,
-    height: 200,
-    title: 'Add Item'
-  });
-  addWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'addWindow.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
-  // Handle garbage collection
-  addWindow.on('close', function () {
-    addWindow = null;
-  });
-}
-
-// Catch item:add
-ipcMain.on('item:add', function (e, item) {
-  mainWindow.webContents.send('item:add', item);
-  addWindow.close();
-  // Still have a reference to addWindow in memory. Need to reclaim memory (Grabage collection)
-  //addWindow = null;
-});
 
 // Create menu template
 const mainMenuTemplate = [
@@ -126,7 +82,6 @@ if (process.platform == 'darwin') {
 }
 
 // Add developer tools option if in dev
-
 if (process.env.NODE_ENV !== 'production') {
   mainMenuTemplate.push({
     label: 'Developer Tools',

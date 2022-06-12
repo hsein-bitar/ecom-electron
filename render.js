@@ -6,6 +6,21 @@ ipcRenderer.on('addItem', addItemForm);
 ipcRenderer.on('addCategory', addCategoryForm);
 ipcRenderer.on('home', populateHome);
 
+// convert score to stars rating on restaurant cards
+let generateRating = (score) => {
+    let rating_html_string = '';
+    let i = 0;
+    while (i < score) {
+        rating_html_string += '<span class="fa fa-star checked"></span>';
+        i++;
+    }
+    while (i < 5) {
+        rating_html_string += '<span class="fa fa-star"></span>';
+        i++;
+    }
+    return rating_html_string;
+}
+
 function displayMessage(message, theme) {
     let className;
     if (theme == 0) { className = 'good' } else { className = 'bad' }
@@ -26,6 +41,25 @@ function displayMessage(message, theme) {
     }, 1000)
 }
 
+function logout() {
+    fetch('http://localhost:8000/api/v1/users/logout', {
+        method: 'post',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + localStorage.getItem('user_token'),
+        }),
+    }).then(response => response.json())
+        .then(response => {
+            if (response.status == 'success') {
+                displayMessage('Logout Successful', 0)
+                localStorage.removeItem('user_token');
+                outlinks();
+                // setTimeout(() => {
+                //     window.location.href = './index.html'
+                // }, 1000)
+            }
+        })
+}
+
 // fired when user submits register form
 function submitRegister() {
     let data = new FormData();
@@ -43,6 +77,7 @@ function submitRegister() {
             if (response.status = 'success') {
                 displayMessage('User Created', 0)
                 localStorage.setItem('user_token', response.authorisation.token);
+                localStorage.setItem('user_id', response.user.id);
                 inlinks();
             } else {
                 displayMessage('Could not register', 1);
@@ -72,6 +107,7 @@ function submitLogin() {
                     console.log(response);
                     displayMessage('Login Successful', 0)
                     localStorage.setItem('user_token', response.authorisation.token);
+                    localStorage.setItem('user_id', response.user.id);
                     inlinks();
                 }
             } else {
@@ -80,28 +116,81 @@ function submitLogin() {
         })
         .catch(
             error => {
+                displayMessage('Could not login', 1);
                 console.log(error);
             }
         )
 
 }
 
-function populateHome() {
+function toggleMyLike(heart) {
+    let increment = heart.classList.contains('liked') ? -1 : 1
+    console.log(heart.parentNode.innerText);
+    let data = new FormData();
+    data.append('item_id', heart.dataset.itemId)
+    fetch('http://localhost:8000/api/v1/likes/toggle', {
+        method: 'post',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + localStorage.getItem('user_token'),
+        }),
+        body: data
+    })
+        .then(response => response.json())
+        .then(response => {
+            console.log(response);
+            if (response.status == 'success') {
+                // toggles user like on a post and // increments the like-count
+                heart.classList.toggle('liked');
+                heart.parentNode.getElementsByTagName('span')[0].innerText = parseInt(heart.parentNode.getElementsByTagName('span')[0].innerText) + increment;
+            }
+        }).catch(error => {
+            console.log(error);
+        })
+}
+
+function checkIfLiked(element) {
+    let fill = '';
+    console.log(element);
+    // user item likes
+    element.likes.forEach(like => {
+        console.log(like.user_id, localStorage.getItem('user_id'));
+        if (like.user_id == localStorage.getItem('user_id')) {
+            console.log('fuiredd');
+            fill = 'liked'
+        }
+    })
+    return fill
+}
+
+function populateWrapper() {
     let links = document.getElementById('in').children
     for (let link of links) {
         link.classList.remove('active')
     }
-    // set home active
     document.getElementById('home').classList.add('active')
     // add none to all forms
     let wrapper = document.getElementById("wrapper");
     wrapper.innerHTML = "";
+    let data = new FormData();
+
+    // get search string
+    data.append('search', document.getElementById('search').value)
+    // get active category
+    let categories = document.getElementsByClassName('category')
+    for (let category of categories) {
+        if (category.classList.contains('active')) {
+            data.append('category_id', category.id)
+            break;
+        }
+    }
     fetch('http://localhost:8000/api/v1/items/', {
         method: 'post',
         headers: new Headers({
             'Authorization': 'Bearer ' + localStorage.getItem('user_token'),
-        })
-    }).then(response => response.json())
+        }),
+        body: data
+    })
+        .then(response => response.json())
         .then(response => {
             if (response.status == 'success') {
                 let gallery = document.createElement("div");
@@ -110,20 +199,26 @@ function populateHome() {
                 let items = '';
                 response.items.forEach(element => {
                     let item = `
-          <div class="item">
-            <a href="#" id=${element.id}>
-              <div class="gradient">
-                <span class="caption">
-                  ${element.title} 
-                  <div class="rating">
+                    <div class="item">
+                    <div class="gradient">
+                    <h3 class="price">$${element.price}</h3>
+                    <div class="likes-count">
+                    <div>
+                    <i class="fa fa-heart ${checkIfLiked(element)}" data-item-id=${element.id} onclick="toggleMyLike(this)"></i>
+                    <span>${element.likes_count}</span>
                     </div>
-                    </span>
                     </div>
-                    <img src="${element.image_uri}" />
-                    </a>
+                    <a href="#" id=${element.id}>
+                        <span class="caption">
+                                ${element.title} 
+                            </span>
+                            </a>
+                        </div>
+                        <img src="${element.image_uri}" />
                     </div>
-                    `;
+                        `;
                     items += item;
+
                 });
                 gallery.innerHTML = items;
                 wrapper.appendChild(gallery);
@@ -134,7 +229,62 @@ function populateHome() {
         })
 }
 
+function search(ele) {
+    if (ele.keyCode === 13) {
+        populateWrapper();
+    }
+}
+function activateCategory(ee) {
+    let bool = ee.classList.contains('active') ? 0 : 1;
+    let categories = document.getElementsByClassName('category')
+    for (let category of categories) {
+        category.classList.remove('active')
+    }
+    if (bool) {
+        ee.classList.add('active')
+    }
+    populateWrapper();
+}
+function populateHome() {
+    let filters = document.getElementById('filters');
+    if (filters) { filters.parentNode.removeChild(filters) }
+    fetch('http://localhost:8000/api/v1/categories', {
+        method: 'get',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + localStorage.getItem('user_token')
+        })
+    }).then(response => response.json())
+        .then(response => {
+            let filters = document.createElement("div");
+            filters.id = 'filters'
+            let categories = '';
+            response.categories.forEach(i => {
+                let category = `
+                <li class="category" onclick="activateCategory(this)" id=${i.id}>${i.name}</li>
+                `;
+                categories += category;
+            })
+            filters.innerHTML = `
+            <input type="text" id="search" onkeypress="search(event)" placeholder="Search">
+        <div id="categories-wrapper">
+            <ul id="categories">
+               ${categories}
+            </ul>
+        </div>
+            `;
+            let hr = document.getElementsByTagName('hr')[0];
+            hr.after(filters);
+        }).catch(error => {
+            displayMessage('Invalid server response', 1);
+            outlinks();
+            console.log(error);
+        }).then(() => populateWrapper())
+}
+
+
 function addItemForm() {
+    let filters = document.getElementById('filters');
+    if (filters) { filters.parentNode.removeChild(filters) }
     let links = document.getElementById('in').children;
     for (let link of links) {
         link.classList.remove('active')
@@ -192,6 +342,7 @@ function addItemForm() {
         })
 
 }
+
 // fired to submit an item
 function handleAddItem() {
     let data = new FormData();
@@ -228,6 +379,9 @@ function handleAddItem() {
 
 
 function addCategoryForm() {
+    let filters = document.getElementById('filters');
+    if (filters) { filters.parentNode.removeChild(filters) }
+
     let links = document.getElementById('in').children;
     for (let link of links) {
         link.classList.remove('active')
@@ -241,10 +395,6 @@ function addCategoryForm() {
       <form id="add-category-form" class="" name="add-category-form" novalidate>
         <input type="text" id="name" placeholder="Enter category name" required>
         <input type="text" id="description" placeholder="Enter category description" required>
-        <div>
-        <label for="icon">SVG Icon:</label>
-        <input type="file" id="icon" required/>
-    </div>
         <div>
           <button onclick="handleAddCategory()" id="add-category-submit" class="action" type="button"> Add Category</button>
           <button onclick="populateHome()" class="cancel-button">Cancel</button>
@@ -283,6 +433,9 @@ function handleAddCategory() {
 }
 
 function addLoginForm() {
+    // TODO check if wokrs
+    let filters = document.getElementById('filters');
+    if (filters) { filters.parentNode.removeChild(filters) }
     let links = document.getElementById('out').children;
     for (let link of links) {
         link.classList.remove('active')
@@ -350,30 +503,35 @@ function exit() {
     if (process.platform !== 'darwin') { remote.app.exit(); }
 }
 function outlinks() {
+    let filters = document.getElementById('filters');
+    if (filters) { filters.parentNode.removeChild(filters) }
     let links = document.getElementById('links');
     links.innerHTML = `
-  <ul id="out" class="">
-    <li onclick="addLoginForm()" id="login"> <a href="#">Login</a></li>
-    <li onclick="addRegisterForm()" id="register"> <a href="#">Register</a></li>
-    <li onclick="exit()" class="x"> <a href="#">X</a></li>
+    <ul id="out" class="">
+        <li onclick="addLoginForm()" id="login"> <a href="#">Login</a></li>
+        <li onclick="addRegisterForm()" id="register"> <a href="#">Register</a></li>
+        <li onclick="exit()" class="x"> <a href="#">X</a></li>
     </ul>
     `;
     addLoginForm();
 }
 function inlinks() {
-    // TODO add the reviews tab to get all inactive reviews and activate them
     let links = document.getElementById('links');
     links.innerHTML = '';
     links.innerHTML = `
-    <ul id="in" class="">
-      <li onclick="populateHome()" id="home"> <a href="#">Home</a></li>
-      <li onclick="addItemForm()" id="add-item" class=""> <a href="#">Add Item</a></li>
-      <li onclick="addCategoryForm()" id="add-category" class=""> <a href="#">Add Category</a></li>
-      <li onclick="exit()" class="x"> <a href="#">X</a></li>
+    <ul id="in">
+    <li onclick="populateHome()" id="home"> <a href="#">Home</a></li>
+    <li onclick="addItemForm()" id="add-item" class=""> <a href="#">Add Item</a></li>
+    <li onclick="addCategoryForm()" id="add-category" class=""> <a href="#">Add Category</a></li>
+    <li onclick="logout()" id="logout"> <a href="#">Logout</a></li>
+    <li onclick="exit()" class="x"> <a href="#">X</a></li>
     </ul>
       `;
-    setTimeout(populateHome, 1000)
-
-
+    populateHome();
 }
-window.onload = outlinks;
+
+if (localStorage.getItem('user_token')) {
+    window.onload = inlinks;
+} else {
+    window.onload = outlinks;
+}

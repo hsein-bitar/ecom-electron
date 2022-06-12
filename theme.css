@@ -12,6 +12,7 @@ input[type=file]::file-selector-button:hover {
 
 ::-webkit-scrollbar {
     width: 2px;
+    height: 2px;
 }
 
 /* Track */
@@ -21,7 +22,7 @@ input[type=file]::file-selector-button:hover {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: var(--mid);
+    background: var(--dark);
 }
 
 /* Handle on hover */
@@ -30,6 +31,7 @@ input[type=file]::file-selector-button:hover {
 }
 
 :root {
+    --white: rgb(255, 255, 255);
     --bright: rgb(182, 182, 182);
     --mid: rgb(71, 71, 71);
     --dark: black;
@@ -43,11 +45,11 @@ input[type=file]::file-selector-button:hover {
 
 /* html, */
 body {
-    background-color: var(--bright);
+    background-color: var(--white);
     padding: var(--padding);
     width: 100vw;
-    /* height: 100vh; */
-    height: 700px;
+    height: 100vh;
+    /* height: 700px; */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -151,7 +153,7 @@ nav {
     display: flex;
     align-items: center;
     vertical-align: middle;
-    list-style: none;
+    list-style: none !important;
 }
 
 .nav-wrapper ul * {
@@ -220,7 +222,7 @@ a {
 }
 
 hr {
-    margin-top: 8vh;
+    margin-top: 7vh;
 }
 
 /* styling for grid of cards */
@@ -262,8 +264,8 @@ hr {
     }
 
     .gallery img {
-        height: 100%;
-        width: 100%;
+        min-height: 100%;
+        min-width: 100%;
         object-fit: cover;
     }
 }
@@ -272,14 +274,16 @@ hr {
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 300px;
+    min-height: 240px;
     border: 1px solid var(--mid);
+    max-width: 400px;
+    max-height: 400px;
 }
 
 .gallery .item img {
     z-index: -9999;
-    height: 100%;
-    width: 100%;
+    min-height: 100%;
+    min-width: 100%;
     object-fit: cover;
 }
 
@@ -338,9 +342,9 @@ hr {
     position: absolute;
 }
 
-.rating {
+/* .rating {
     margin-top: 20px;
-}
+} */
 
 .gradient:hover {
     background: linear-gradient(to bottom,
@@ -406,10 +410,96 @@ button:focus {
 
 .active {
     border-bottom: 3px solid var(--accent-2);
+    color: black;
+    font-weight: 900;
+}
+
+.active * {
+    color: black;
+    font-weight: 900;
 }
 
 button:hover {
     cursor: pointer;
     background-color: var(--bright);
     color: var(--dark);
+}
+
+
+.fa-heart {
+    color: rgb(255, 255, 255);
+}
+
+.liked {
+    color: rgb(125, 12, 12);
+}
+
+.price {
+    font-weight: 900;
+    color: rgb(22, 88, 0);
+}
+
+h3.price {
+    position: absolute;
+    bottom: 20px;
+    font-size: 1.6rem;
+}
+
+
+/* index */
+
+#categories-wrapper {
+    width: 100%;
+    /* border: 1px solid red; */
+}
+
+#categories {
+    margin-top: 10px;
+    list-style: none;
+    max-width: 600px;
+    overflow-x: scroll;
+    display: flex;
+    justify-content: center;
+}
+
+#categories>li {
+    /* margin: 10px 20px; */
+    padding: 5px 40px;
+    /* border-left: 1px solid;
+    border-right: 1px solid; */
+}
+
+#filters {
+    margin: auto;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+}
+
+#filters>input {
+    margin: 0px 50px;
+    /* border: 1px solid red; */
+}
+
+.likes-count {
+    -webkit-text-stroke: 1px var(--mid);
+    color: var(--white);
+    font-size: 25px;
+    vertical-align: middle;
+    width: 40px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+}
+
+/* end index */
+
+
+/* items */
+
+/* overrides */
+.wrapper {
+    /* border: 1px solid red; */
+    overflow-y: scroll;
 }
