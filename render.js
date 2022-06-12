@@ -144,34 +144,53 @@ function addItemForm() {
     wrapper.innerHTML = "";
     let form_wrapper = document.createElement("div");
     form_wrapper.id = "form-wrapper";
-    // TODO call backend get all distinct categories
-    let add_item_form = `
-        <form id="add-item-form" class="" name="add-item-form" novalidate>
-          <input type="text" id="title" placeholder="Enter item title" required/>
-          <div>
-            <label for="category-id">Category:</label>
-            <select name="category-id" id="category-id" required>
-              <option value="1">Cat 1</option>
-              <option value="2">Cat 2</option>
-            </select>
-          </div>
-          <input type="text" id="details" placeholder="Enter item details" required/>
-          <div>
-            <label for="price">Price:</label>
-            <input type="number" id="price" min="1" step="any" required/>
-          </div>
-          <div>
-            <label for="image">Cover:</label>
-            <input type="file" id="image" required/>
-          </div>
-          <div>
-            <button onclick="handleAddItem()" id="add-item-submit" class="action" type="button">Add Item</button>
-            <button onclick="populateHome()" class="cancel-button" onclick="cancelForm()">Cancel</button>
-          </div>
-        </form>          
-  `;
-    form_wrapper.innerHTML = add_item_form;
-    wrapper.appendChild(form_wrapper);
+    fetch('http://localhost:8000/api/v1/categories', {
+        method: 'get',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + localStorage.getItem('user_token')
+        })
+    })
+        .then(response => response.json())
+        .then(response => {
+            let categories = '';
+            response.categories.forEach(i => {
+                let option = `
+                <option value=${i.id}>${i.name}</option>
+                `;
+                categories += option;
+
+            });
+            // TODO call backend get all distinct categories
+            let add_item_form = `
+            <form id="add-item-form" class="" name="add-item-form" novalidate>
+            <input type="text" id="title" placeholder="Enter item title" required/>
+            <div>
+                <label for="category-id">Category:</label>
+                <select name="category-id" id="category-id" required>               
+                <option value="" disabled selected hidden>Choose Category...</option>
+                     ${categories}
+                </select>
+            </div>
+            <input type="text" id="details" placeholder="Enter item details" required/>
+            <div>
+                <label for="price">Price:</label>
+                <input type="number" id="price" min="1" step="any" required/>
+            </div>
+            <div>
+                <label for="image">Cover:</label>
+                <input type="file" id="image" required/>
+            </div>
+            <div>
+                <button onclick="handleAddItem()" id="add-item-submit" class="action" type="button">Add Item</button>
+                <button onclick="populateHome()" class="cancel-button" onclick="cancelForm()">Cancel</button>
+            </div>
+            </form>          
+            `;
+            form_wrapper.innerHTML = add_item_form;
+            wrapper.appendChild(form_wrapper);
+            console.log(i)
+        })
+
 }
 // fired to submit an item
 function handleAddItem() {
