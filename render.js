@@ -150,12 +150,9 @@ function toggleMyLike(heart) {
 
 function checkIfLiked(element) {
     let fill = '';
-    console.log(element);
     // user item likes
     element.likes.forEach(like => {
-        console.log(like.user_id, localStorage.getItem('user_id'));
         if (like.user_id == localStorage.getItem('user_id')) {
-            console.log('fuiredd');
             fill = 'liked'
         }
     })
