@@ -242,6 +242,10 @@ function addCategoryForm() {
         <input type="text" id="name" placeholder="Enter category name" required>
         <input type="text" id="description" placeholder="Enter category description" required>
         <div>
+        <label for="icon">SVG Icon:</label>
+        <input type="file" id="icon" required/>
+    </div>
+        <div>
           <button onclick="handleAddCategory()" id="add-category-submit" class="action" type="button"> Add Category</button>
           <button onclick="populateHome()" class="cancel-button">Cancel</button>
         </div>
